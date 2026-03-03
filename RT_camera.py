@@ -82,6 +82,17 @@ class Camera:
         self.film[heightId,widthId,1] = self.intensity.clamp(g)
         self.film[heightId,widthId,2] = self.intensity.clamp(b)
 
+    def write_tile_to_film(self, x0, y0, tile_data):
+        # Scale by samples per pixel
+        scale = 1.0 / self.samples_per_pixel
+        tile_data *= scale
+
+        tile_data = np.sqrt(tile_data)
+
+        tile_data = np.clip(tile_data, 0.0, 1.0)
+
+        h, w, _ = tile_data.shape
+        self.film[y0:y0+h, x0:x0+w] = tile_data
 
     def get_center_ray(self, i, j):
         pixel_center = self.pixel00_location + (self.pixel_du*i) + (self.pixel_dv*j)

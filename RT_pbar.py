@@ -7,9 +7,9 @@ def start_animated_marker(maxbar):
     widgets = ['Rendering: ', 
                progressbar.Bar('='),
                ' (',
-               progressbar.ETA(),
+               progressbar.AdaptiveETA(),
                ')']
     bar = progressbar.ProgressBar(max_value=maxbar, widgets=widgets).start()
-     
+    bar.update(1)    
     return bar
          

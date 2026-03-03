@@ -44,15 +44,15 @@ def renderDoF():
     intg = rti.Integrator(bSkyBG=True)
 
     renderer = rtren.Renderer(main_camera, intg, world)
-    renderer.render_jittered()
+    renderer.render(type=rtu.RenderType.JITTERED)
     renderer.write_img2png('week10_aperture_jittered_DoF.png')    
 
 def renderMoving():
     main_camera = rtc.Camera()
     main_camera.aspect_ratio = 16.0/9.0
-    main_camera.img_width = 480
+    main_camera.img_width = 480 
     main_camera.center = rtu.Vec3(0,0,0)
-    main_camera.samples_per_pixel = 10
+    main_camera.samples_per_pixel = 100
     main_camera.max_depth = 5
     main_camera.vertical_fov = 60
     main_camera.look_from = rtu.Vec3(-2, 2, 1)
@@ -85,7 +85,7 @@ def renderMoving():
     intg = rti.Integrator(bSkyBG=True)
 
     renderer = rtren.Renderer(main_camera, intg, world)
-    renderer.render()
+    renderer.render(type=rtu.RenderType.JITTERED)
     renderer.write_img2png('week10_moving_jitter.png')    
 
 if __name__ == "__main__":

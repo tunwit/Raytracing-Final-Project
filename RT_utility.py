@@ -3,6 +3,7 @@ import math
 import numpy as np
 from PIL import Image as im
 import sys
+from enum import Enum
 
 global infinity_number
 global pi 
@@ -15,6 +16,11 @@ def random_double(min=0.0, max=1.0):
 
 def linear_to_gamma(val, gammaVal):
     return math.pow(val, 1.0/gammaVal)
+
+class RenderType(Enum):
+    NORMAL = "normal"
+    JITTERED = "jittered"
+
 
 class Vec3:
     def __init__(self, e0=0.0, e1=0.0, e2=0.0) -> None:
