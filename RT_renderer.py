@@ -132,7 +132,8 @@ class Renderer():
             self.camera.img_height,
             tile_size
         )
-        chunksize = max(1, len(tiles) // (4 * mp.cpu_count()))
+        chunksize = max(4, min(16, len(tiles) // (mp.cpu_count() * 4)))
+        # chunksize= 4
         k = -1
         sqrt,func = self._get_compute_function(type)
         print(f"Innitilizing with \nNumber of processor: {mp.cpu_count()}\nTile size: {tile_size}\nChunk size:{chunksize}")
@@ -147,20 +148,19 @@ class Renderer():
                 renderbar.update(k)
         renderbar.finish()
 
-    def _compute_adaptive_tile_size(self,width, height, spp):
+    def _compute_adaptive_tile_size(self, width, height, spp):
         cpu = mp.cpu_count()
         workload_factor = math.sqrt(spp)
 
+        MIN_TILE_MULTIPLIER = 8
         target_tiles = int(cpu * 6 / max(1, workload_factor / 5))
+        target_tiles = max(cpu * MIN_TILE_MULTIPLIER, target_tiles) 
 
-        target_tiles = max(cpu * 2, target_tiles)
         total_pixels = width * height
-        tile_area = total_pixels / target_tiles
+        tile_area    = total_pixels / target_tiles
+        tile_size    = int(math.sqrt(tile_area))
 
-        tile_size = int(math.sqrt(tile_area))
-
-        # clamp bounds
-        tile_size = max(32, min(256, tile_size))
+        tile_size = max(16, min(128, tile_size))
 
         return tile_size
 
