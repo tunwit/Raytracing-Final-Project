@@ -145,6 +145,8 @@ def renderTriangle():
 
 
     world = rts.Scene()
+    # street_light = rttr.MeshTranformer.obj_mtl_to_mesh("model/street_with_light/tinker.obj",rtm.Phong,rtu.Vec3(-3,-0.5,0))
+    # street_light.set_transform(1,rtu.Vec3(0,180,0))
 
     #---- Plate ----
     world.add_object(
@@ -180,5 +182,3 @@ def renderTriangle():
 if __name__ == "__main__":
     # renderDoF()
     renderTriangle()
-
-
