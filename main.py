@@ -9,174 +9,173 @@ import RT_light as rtl
 import RT_texture as rtt
 import RT_transformer as rttr
 
-def renderDoF():
-    main_camera = rtc.Camera()
-    main_camera.aspect_ratio = 16.0/9.0
-    main_camera.img_width = 3840
-    main_camera.center = rtu.Vec3(0,0,0)
-    main_camera.samples_per_pixel = 1024
-    main_camera.max_depth = 5
-    main_camera.vertical_fov = 60
-    main_camera.look_from = rtu.Vec3(-2, 1, 2)
-    main_camera.look_at = rtu.Vec3(0, 0, 0)
-    main_camera.vec_up = rtu.Vec3(0, 1, 0)
+def createRoom(world):
+    concreat_tex = rtt.ConcreteTexture(rtu.Color(1,1,1),2)
+    concreat_mat = rtm.TextureColor(concreat_tex)
+    white = rtm.Lambertian(rtu.Color(1,1,1))
+    laminat_tex = rtt.ImageTexture("textures/laminate.jpg")
+    laminat_mat = rtm.TextureColor(laminat_tex)
 
-    aperture = 1.0
-    defocus_angle = 2.0
-    focus_distance = 5.0
-    main_camera.init_camera(defocus_angle, focus_distance,aperture)
-    # add objects to the scene
+    #---- floor ----
+    world.add_object(
+        rto.Quad(
+            rtu.Vec3(-50, 0 , -100),       # origin (shifted so center stays same)
+            rtu.Vec3(200, 0, 0),           # width
+            rtu.Vec3(0, 0, 200),           # depth
+            laminat_mat
+        )
+    )
 
-    tex_checker_bw = rtt.CheckerTexture(0.32, rtu.Color(.2, .2, .2), rtu.Color(.9, .9, .9))
+    #---- right wall ----
+    world.add_object(
+    rto.Quad(
+        rtu.Vec3(-50, 0, -100),   # bottom-left
+        rtu.Vec3(200, 0, 0),     # width (X)
+        rtu.Vec3(0, 100, 0),     # height (Y)
+        white
+    )
+)
+    #---- left wall ----
+    world.add_object(
+    rto.Quad(
+        rtu.Vec3(-50, 0, 100),
+        rtu.Vec3(200, 0, 0),
+        rtu.Vec3(0, 100, 0),
+        white
+        )
+    )
 
-    mat_tex_checker_bw = rtm.TextureColor(tex_checker_bw)
+    #---- back wall ----
+    world.add_object(
+    rto.Quad(
+        rtu.Vec3(100, 0, -100),
+        rtu.Vec3(0, 0, 200),
+        rtu.Vec3(0, 100, 0),
+        white
+        )
+    )
 
-    mat_blinn1 = rtm.Blinn(rtu.Color(0.8, 0.5, 0.8), 0.5, 0.2, 8)
-    mat_blinn2 = rtm.Blinn(rtu.Color(0.4, 0.5, 0.4), 0.5, 0.6, 8)
-    mat_blinn3 = rtm.Blinn(rtu.Color(0.8, 0.5, 0.4), 0.5, 0.2, 8)
+    # #---- top wall ----
+    world.add_object(
+        rto.Quad(
+            rtu.Vec3(-50, 100 , -100),       # origin (shifted so center stays same)
+            rtu.Vec3(200, 0, 0),           # width
+            rtu.Vec3(0, 0, 200),           # depth
+            white
+        )
+    )
 
+    wall_y_min = 0
+    wall_y_max = 100
 
-    world = rts.Scene()
-    world.add_object(rto.Sphere(rtu.Vec3(   0,-100.5,-1),  100, mat_tex_checker_bw))
-    world.add_object(rto.Sphere(rtu.Vec3(-1.0,   0.0,-1),  0.5, mat_blinn1))    # left
-    world.add_object(rto.Sphere(rtu.Vec3(   0,   0.0,-1),  0.5, mat_blinn2))    # center
-    world.add_object(rto.Sphere(rtu.Vec3( 1.0,   0.0,-1),  0.5, mat_blinn3))    # right
+    window_y_min = 20
+    window_y_max = 70
 
-    intg = rti.Integrator(bSkyBG=True)
+    window_z_min = -40
+    window_z_max = 90
 
-    renderer = rtren.Renderer(main_camera, intg, world)
-    renderer.render(type=rtu.RenderType.JITTERED)
-    renderer.write_img2png('week10_aperture_jittered_DoF.png')    
+    x = -50
 
-def renderMoving():
-    main_camera = rtc.Camera()
-    main_camera.aspect_ratio = 16.0/9.0
-    main_camera.img_width = 480 
-    main_camera.center = rtu.Vec3(0,0,0)
-    main_camera.samples_per_pixel = 1
-    main_camera.max_depth = 5
-    main_camera.vertical_fov = 60
-    main_camera.look_from = rtu.Vec3(1, 2, -2)
-    main_camera.look_at = rtu.Vec3(0,-0.5,-1.5)
-    main_camera.vec_up = rtu.Vec3(0, 1, 0)
+    #---- bottom window part ----
+    world.add_object(
+    rto.Quad(
+        rtu.Vec3(x, wall_y_min, -100),
+        rtu.Vec3(0, 0, 200),
+        rtu.Vec3(0, window_y_min, 0),
+        white
+        )
+    )
 
-    defocus_angle = 0.0
-    focus_distance = 5.0
-    main_camera.init_camera(defocus_angle, focus_distance)
-    # add objects to the scene
-
-    tex_checker_bw = rtt.CheckerTexture(0.32, rtu.Color(.2, .2, .2), rtu.Color(.9, .9, .9))
-
-    mat_tex_checker_bw = rtm.TextureColor(tex_checker_bw)
-
-    mat_blinn1 = rtm.Blinn(rtu.Color(0.8, 0.5, 0.8), 0.5, 0.2, 8)
-    mat_blinn2 = rtm.Blinn(rtu.Color(0.4, 0.5, 0.4), 0.5, 0.6, 8)
-    mat_blinn3 = rtm.Blinn(rtu.Color(0.8, 0.5, 0.4), 0.5, 0.2, 8)
-
-
-    sph_left = rto.Sphere(rtu.Vec3(-1.0,   0.0,-1),  0.5, mat_blinn1)
-    sph_left.add_moving(rtu.Vec3(-1.0,   0.0,-1) + rtu.Vec3(0.0, 0.5,0.0))
-
-    world = rts.Scene()
-    world.add_object(rto.Sphere(rtu.Vec3(   0,-100.5,-1),  100, mat_tex_checker_bw))
-    world.add_object(sph_left)    # left
-    world.add_object(rto.Sphere(rtu.Vec3(   0,   0.0,-1),  0.5, mat_blinn2))    # center
-    world.add_object(rto.Sphere(rtu.Vec3( 1.0,   0.0,-1),  0.5, mat_blinn3))    # right
-
-    intg = rti.Integrator(bSkyBG=True)
-
-    renderer = rtren.Renderer(main_camera, intg, world)
-    renderer.render(type=rtu.RenderType.JITTERED)
-    renderer.write_img2png('week10_moving_jitter.png')    
+    #---- top window part ----
+    world.add_object(
+    rto.Quad(
+        rtu.Vec3(x, window_y_max, -100),  
+        rtu.Vec3(0, 0, 200),              
+        rtu.Vec3(0, wall_y_max - window_y_max, 0), 
+        white
+        )
+    )
+    
+    #---- right window part ----
+    world.add_object(
+    rto.Quad(
+        rtu.Vec3(x, window_y_min, -100),   # start at left side
+        rtu.Vec3(0, 0, window_z_min - (-100)),  # width in Z
+        rtu.Vec3(0, window_y_max - window_y_min, 0),  # height
+        white
+        )
+    )
+    #---- left window part ----
+    world.add_object(
+    rto.Quad(
+        rtu.Vec3(x, window_y_min, window_z_max),  # start at right side of window
+        rtu.Vec3(0, 0, 100 - window_z_max),       # remaining width
+        rtu.Vec3(0, window_y_max - window_y_min, 0),
+        white
+        )
+    )
+    
 
 def renderTriangle():
     main_camera = rtc.Camera()
     main_camera.aspect_ratio = 16.0/9.0
     main_camera.img_width = 480  
     main_camera.center = rtu.Vec3(0,0,0)
-    main_camera.samples_per_pixel = 10
-    main_camera.max_depth = 10
-    main_camera.vertical_fov = 60
+    main_camera.samples_per_pixel = 100
+    main_camera.max_depth = 5
+    main_camera.vertical_fov = 90
     # main_camera.look_from = rtu.Vec3(7, 5, -3)
-    main_camera.look_from = rtu.Vec3(1, 2, -4)
-    main_camera.look_at = rtu.Vec3(0, 0, 0)
+    # main_camera.look_from = rtu.Vec3(20, 200, 200)
+    main_camera.look_from = rtu.Vec3(-40, 30, -40)
+    main_camera.look_at = rtu.Vec3(30,10,10)
     main_camera.vec_up = rtu.Vec3(0, 1, 0)
     
     defocus_angle = 0
     focus_distance = (main_camera.look_at - main_camera.look_from).len()
     main_camera.init_camera(defocus_angle, focus_distance)
 
-    tex_checker_bw = rtt.CheckerTexture(0.32, rtu.Color(0,0, 0), rtu.Color(0.8, 0.8, 0.8))
+    sun_light = rtl.Diffuse_light(rtu.Color(1.0 , 0.94, 0.81))
+    #---- Texture ----
     tex_checker_bw = rtt.ImageTexture("textures/blueprint.jpg")
 
+    #---- Material ----
     mat_tex_checker_bw = rtm.TextureColor(tex_checker_bw)
+    lambertian_black_mat = rtm.Lambertian(rtu.Color(0,0,0))
+    metal_mat = rtm.Metal(rtu.Color(0,0,0),0.1)
 
 
-    mat_blinn1 = rtm.Blinn(rtu.Color(0.8, 0.5, 0.8), 0.5, 0.2, 8)
-    mat_blinn2 = rtm.Blinn(rtu.Color(0.4, 0.5, 0.4), 0.5, 0.6, 8)
-    mat_blinn3 = rtm.Blinn(rtu.Color(0.8, 0.5, 0.4), 0.5, 0.2, 8)
-
-    mat_red   = rtm.Lambertian(rtu.Color(1, 0, 0))  # +X
-    mat_green = rtm.Lambertian(rtu.Color(0, 1, 0))  # +Y
-    mat_blue  = rtm.Lambertian(rtu.Color(0, 0, 1))  # +Z
-
-    light = rtl.Diffuse_light(rtu.Color(0.98, 0.36, 0.36))
-
-
-    sph_left = rto.Sphere(rtu.Vec3(-1.0,   0.0,-1),  0.5, mat_blinn1)
-    # building =  rttr.MeshTranformer.obj_mtl_to_mesh("model/building/tinker.obj",rtm.Lambertian,rtu.Vec3(0,-0.5,0))
-    # building.set_transform(1.5,rtu.Vec3(0,-90,0))
-
-    dialectrict = rtm.Dielectric(rtu.Color(0.1,0.5,0),0.9)
-
-
-    car =  rttr.MeshTranformer.obj_mtl_to_mesh("model/car/tinker.obj",dialectrict,rtu.Vec3(0,-0.5,-1.5))
-    car.set_transform(1,rtu.Vec3(0,180,0))
-    # car2 =  rttr.MeshTranformer.obj_mtl_to_mesh("model/car/tinker.obj",rtm.Lambertian,rtu.Vec3(0,-0.5,-2.5))
-    # car2.set_transform(0.4,rtu.Vec3(0,180,0))
-    # street_light = rttr.MeshTranformer.obj_mtl_to_mesh("model/street_with_light/tinker.obj",rtm.Phong,rtu.Vec3(1.9,-0.5,0))
-    # street_light.set_transform(1,rtu.Vec3(0,180,0))
-
-    # street = rttr.MeshTranformer.obj_mtl_to_mesh("model/street/tinker.obj",rtm.Phong,rtu.Vec3(1.6,-0.5,-2))
-    # street.set_transform(1,rtu.Vec3(0,180,0))
-    # street2 = rttr.MeshTranformer.obj_mtl_to_mesh("model/street/tinker.obj",rtm.Phong,rtu.Vec3(1.6,-0.5,2))
-    # street2.set_transform(1,rtu.Vec3(0,180,0))
     world = rts.Scene()
 
-    
-    # metal2 = rtm.Metal(rtu.Color(0.0,1.0,0.0),0.5)
-    # metal3 = rtm.Metal(rtu.Color(0.0,0.0,1.0),0.1)
-
-
-
+    #---- Plate ----
     world.add_object(
         rto.Quad(
-            rtu.Vec3(-3, -0.5, -4),  # origin (shifted so center stays same)
-            rtu.Vec3(8, 0, 0),           # width
-            rtu.Vec3(0, 0, 8),           # depth
+            rtu.Vec3(-500, -0.5 , -500),       # origin (shifted so center stays same)
+            rtu.Vec3(1000, 0, 0),           # width
+            rtu.Vec3(0, 0, 1000),           # depth
             mat_tex_checker_bw
         )
     )
-    # world.add_object(sph_left)    # left
-    world.add_object(rto.Sphere(rtu.Vec3( 0, 1 ,0 ),  0.07, light))
-    # world.add_object(rto.Sphere(rtu.Vec3(0, 0 ,2 ),  0.7, mirror))   
-    # world.add_object(rto.Sphere(rtu.Vec3( 0, 0 ,0 ),  0.7, metal2))  
-    # world.add_object(rto.Sphere(rtu.Vec3( 0, 0 ,-2),  0.7, metal3))    # center
+    createRoom(world)
+    sofa = rttr.MeshTranformer.obj_mtl_to_mesh("model/sofa/tinker.obj",lambertian_black_mat,rtu.Vec3(60,0,-10))
+    sofa.set_transform(40,rtu.Vec3(0,90,0))
+    world.add_object(sofa)
 
-        # center
-    # world.add_object(building)
-    world.add_object(car)
-    # world.add_object(car2)
-    # world.add_object(street_light)
-    # world.add_object(street)
-    # world.add_object(street2)
+    table = rttr.MeshTranformer.obj_mtl_to_mesh("model/coffee_table/tinker.obj",metal_mat,rtu.Vec3(0,0,-10))
+    table.set_transform(25,rtu.Vec3(0,90,0))
+    world.add_object(table)
 
-    intg = rti.Integrator(bSkyBG=False,roulette=True)
+    flower = rttr.MeshTranformer.obj_mtl_to_mesh("model/flower_vase/tinker.obj",lambertian_black_mat,rtu.Vec3(0,15,-10))
+    flower.set_transform(10)
+    world.add_object(flower) 
+
+    sun = rto.Sphere(rtu.Vec3(-200,100,0),5,sun_light)
+    world.add_object(sun)
+
+    intg = rti.Integrator(bSkyBG=True,roulette=True)
 
     renderer = rtren.Renderer(main_camera, intg, world)
     renderer.render(type=rtu.RenderType.JITTERED)
-    renderer.write_img2png('t.png')    
-
+    renderer.write_img2png('test_1024_8.png')    
 
 if __name__ == "__main__":
     # renderDoF()

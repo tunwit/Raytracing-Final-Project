@@ -86,4 +86,17 @@ class ImageTexture(Texture):
         
         return rtu.Color(r, g, b)
     
+class ConcreteTexture(Texture):
+    def __init__(self,cColor, scale=5.0):
+        self.scale = scale
+        self.solid_color = cColor
 
+    def tex_value(self, u, v, p):
+        base = rtu.Color(0.55, 0.55, 0.55)
+
+        n = math.sin(self.scale*p.x()) * math.sin(self.scale*p.y()) * math.sin(self.scale*p.z())
+        n = 0.5 * (n + 1.0)
+
+        spots = 0.2 if n < 0.3 else 1.0
+
+        return base * (0.7 + 0.3*n) * spots

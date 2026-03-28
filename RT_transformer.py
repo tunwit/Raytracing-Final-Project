@@ -96,6 +96,11 @@ class MeshTranformer():
 
         for tri, material in all_triangles:
             color = material.diffuse[:3] if material.diffuse else (0, 0, 0)
+            opacity = getattr(material, 'transparency', 1.5)
+            if opacity < 0.99:
+                cp_mat = rtm.Dielectric(rtu.Color(color[0], color[1], color[2]),opacity)
+                args_list.append((tri, center, scale, cp_mat, pos, half_height))
+                continue
             try:
                 cp_mat = copy.deepcopy(mat)
                 cp_mat.color_albedo = rtu.Color(color[0], color[1], color[2])
