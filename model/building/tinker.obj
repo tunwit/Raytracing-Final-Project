@@ -720,7 +720,7 @@ v -1.429 		-42 		16.998
 
 g group_0_40919
 
-usemtl color_40919
+usemtl color_409192
 s 0
 
 f 22 	23 	24
@@ -2685,7 +2685,7 @@ v -16.554 		-0.5 		35.75
 
 g group_1_40919
 
-usemtl color_40919
+usemtl color_409192
 s 0
 
 f 748 	749 	751
@@ -4219,7 +4219,7 @@ v -16.6376 		-0.6766 		55.75
 
 g group_2_40919
 
-usemtl color_40919
+usemtl color_409192
 s 0
 
 f 1252 	1253 	1255
@@ -5761,7 +5761,7 @@ v 14 		-31.591 		80.5
 
 g group_3_40919
 
-usemtl color_40919
+usemtl color_409192
 s 0
 
 f 1724 	1725 	1727

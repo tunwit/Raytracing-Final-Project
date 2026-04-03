@@ -40,7 +40,6 @@ class CheckerTexture(Texture):
         
         return self.odd_texture.tex_value(fu, fv, vPoint)
     
-# an PNG,JPG image as a texture
 class ImageTexture(Texture):
     def __init__(self, strImgFilename) -> None:
         super().__init__()

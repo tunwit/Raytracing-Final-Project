@@ -89,11 +89,10 @@ def compute_tile_jittered_adaptive(tile):
     width, height = x1 - x0, y1 - y0
     tile_data = np.zeros((height, width, 3), dtype=np.float32)
 
-    # --- PRO SETTINGS ---
-    MIN_SAMPLES = 32      # Need a decent baseline for stats to be accurate
+    MIN_SAMPLES = 32  
     MAX_SAMPLES = _worker_sqrt_spp * _worker_sqrt_spp
-    BATCH_SIZE = 32       # Larger batches are more efficient for the CPU
-    MAX_ERROR = 0.02    # 2% relative error allowed (adjust this for quality)
+    BATCH_SIZE = 32  
+    MAX_ERROR = 0.02   
     
     for j in range(y0, y1):
         for i in range(x0, x1):
@@ -116,7 +115,6 @@ def compute_tile_jittered_adaptive(tile):
                     sum_g += s_g
                     sum_b += s_b
 
-                    # Stats based on luminance
                     lum = 0.2126 * s_r + 0.7152 * s_g + 0.0722 * s_b
                     sum_lum += lum
                     sum_lum_sq += lum * lum
@@ -125,16 +123,13 @@ def compute_tile_jittered_adaptive(tile):
                 if count >= MIN_SAMPLES:
                     mean_lum = sum_lum / count
 
-                    # If the pixel is pure black
                     if mean_lum < 0.0001: 
                         break
                     variance = max(0, (sum_lum_sq / count) - (mean_lum ** 2))
                     stdev = math.sqrt(variance)
                     
-                    # 1.96 is the Z-score for 95%
                     interval_width = 1.96 * (stdev / math.sqrt(count))
 
-                    # STOP if the error is small RELATIVE to the brightness
                     if interval_width < (MAX_ERROR * mean_lum):
                         break
             
@@ -161,7 +156,7 @@ class Renderer:
         tile_size = self._compute_adaptive_tile_size(
             self.camera.img_width, self.camera.img_height, self.camera.samples_per_pixel
         )
-        tile_size= 8
+        tile_size= 32
         
         tiles = generate_tiles(self.camera.img_width, self.camera.img_height, tile_size)
         avg_pixel_work = self.camera.samples_per_pixel
@@ -191,7 +186,7 @@ class Renderer:
 
     def _compute_adaptive_tile_size(self, width, height, spp, adaptive=False):
         if adaptive:
-            return 8  # 🔥 sweet spot (try 8–32 depending on scene)
+            return 32
 
         base_pixel_count = 1024  
         workload_factor = math.sqrt(spp)

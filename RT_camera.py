@@ -57,18 +57,15 @@ class Camera:
         self.pixel00_location = self.viewport_upper_left + (self.pixel_du+self.pixel_dv)*0.5
         self.film = np.zeros((self.img_height, self.img_width, self.img_spectrum))
 
-        # compute defocus parameters.
         theta = math.radians(self.Lens.get_defocus_angle())
         defocus_radius = self.Lens.get_focus_dist() * math.tan(theta / 2)
         self.defocus_disk_u = self.camera_frame_u * defocus_radius
         self.defocus_disk_v = self.camera_frame_v * defocus_radius
 
-    # call right before init_camera()
     def set_Lens(self, fDefocusAngle, fFocusDist):
         self.Lens = Thinlens(fDefocusAngle, fFocusDist)
 
     def write_to_film(self, widthId, heightId, cPixelColor):
-        # scaling with samples_per_pixel
         scale = 1.0/self.samples_per_pixel
     
         r = cPixelColor.r()*scale
@@ -104,8 +101,7 @@ class Camera:
         if self.Lens.get_defocus_angle() > 1e-06:
             ray_origin = self.defocus_disk_sample()
         ray_direction = pixel_sample - ray_origin
-        ray_time = rtu.random_double()              # an additional parameter for motion blur
-
+        ray_time = rtu.random_double()              
         return rtr.Ray(ray_origin, ray_direction, ray_time)
     
     def get_jittered_ray(self, i, j, s_i, s_j):
@@ -117,8 +113,7 @@ class Camera:
         if self.Lens.get_defocus_angle() > 1e-06:
             ray_origin = self.defocus_disk_sample()
         ray_direction = pixel_sample - ray_origin
-        ray_time = rtu.random_double()              # an additional parameter for motion blur
-
+        ray_time = rtu.random_double()             
         return rtr.Ray(ray_origin, ray_direction,ray_time)
 
     def get_random_jittered_ray(self, i, j):
@@ -138,25 +133,18 @@ class Camera:
         return rtr.Ray(ray_origin, ray_direction,ray_time)
     
     def get_jittered_stratified_ray(self, i, j, sample_index):
-        # Let's assume a 4x4 stratification grid (16 cells total)
         grid_size = 4 
         num_cells = grid_size * grid_size
         
-        # Determine which cell this specific sample belongs to
         cell_idx = sample_index % num_cells
         cell_x = cell_idx % grid_size
         cell_y = cell_idx // grid_size
         
-        # Calculate the boundaries of this specific cell within the pixel
-        # Each cell is 1/grid_size wide/tall
         cell_width = 1.0 / grid_size
         
-        # Pick a random spot ONLY within this tiny cell
-        # random_double() returns 0.0 to 1.0
         stochastic_offset_x = (cell_x + rtu.random_double()) * cell_width - 0.5
         stochastic_offset_y = (cell_y + rtu.random_double()) * cell_width - 0.5
         
-        # Standard ray math
         pixel_center = self.pixel00_location + (self.pixel_du * i) + (self.pixel_dv * j)
         pixel_sample = pixel_center + (self.pixel_du * stochastic_offset_x) + (self.pixel_dv * stochastic_offset_y)
 
@@ -177,7 +165,6 @@ class Camera:
         py = -0.5 + self.one_over_sqrt_spp * (s_j + rtu.random_double())
         return (vDu * px) + (vDv * py)
 
-    # an additional defocus method --> To move the ray orgin away from its center by defecous parameters.
     def defocus_disk_sample(self):
         pp = rtu.Vec3.random_vec3_in_unit_disk()
         du = (self.defocus_disk_u * pp.x())

@@ -16,7 +16,6 @@ class MeshTranformer():
         min_v = rtu.Vec3(float('inf'), float('inf'), float('inf'))
         max_v = rtu.Vec3(float('-inf'), float('-inf'), float('-inf'))
 
-        # Compute bounds
         for tri in stl_data.vectors:
             for v in tri:
                 vec = rtu.Vec3(*v)
@@ -99,6 +98,28 @@ class MeshTranformer():
         for tri, material in all_triangles:
             color = material.diffuse[:3] if material.diffuse else (0, 0, 0)
             opacity = getattr(material, 'transparency', 1.5)
+            #หน้าต่างฟ้า
+            if material.name == "color_409192":
+                cp_mat = rtl.Diffuse_light(
+                    rtu.Color(1, 0.85, 0.65),
+                    intensity=2.0,   # ปรับได้
+                    linear=0.1,
+                    quadratic=0.1
+                )
+                args_list.append((tri, center, scale, cp_mat, pos, half_height))
+                continue
+            #-----------------------------------------
+            #หน้าต่างม่วง
+            if material.name == "color_-1035391374":
+                cp_mat = rtl.Diffuse_light(
+                    rtu.Color(color[0], color[1], color[2]),
+                    intensity=5.0,      # ปรับแรงแสงได้
+                    linear=0.1,
+                    quadratic=0.1
+                )
+                args_list.append((tri, center, scale, cp_mat, pos, half_height))
+                continue
+            #------------------------------
             if opacity < 0.99:
                 cp_mat = rtm.Dielectric(rtu.Color(color[0], color[1], color[2]),1.5)
                 args_list.append((tri, center, scale, cp_mat, pos, half_height))
@@ -127,7 +148,7 @@ class MeshTranformer():
         v2 = (rtu.Vec3(*tri[2]) - center) * scale
 
         def rotate_x(v):
-            return rtu.Vec3(v.x(), v.z(), v.y())
+            return rtu.Vec3(v.x(), v.z(), -v.y())
 
         v0 = rotate_x(v0) + pos
         v1 = rotate_x(v1) + pos

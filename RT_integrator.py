@@ -1,6 +1,3 @@
-# a simple integrator class
-# A ray is hit and then get the color.
-# It is the rendering equation solver.
 import RT_utility as rtu
 import RT_ray as rtr
 import RT_material as rtm
@@ -26,13 +23,11 @@ class Integrator():
             hmat = hinfo.getMaterial()
             sinfo = hmat.scattering(rGen_ray, hinfo)
 
-            # if no scattering (It is a light source)
             if sinfo is None:
                 return hmat.emitting()
 
             Le = rtu.Color()
 
-            # direct lighting
             if self.bool_direct_lighting :
                 eps = 1e-5
                 
@@ -41,16 +36,13 @@ class Integrator():
                         continue
                     surface_point = hinfo.getP()
 
-                    # old style: compute vector to light
                     tolight_vec = light.center - surface_point
                     max_distance = tolight_vec.len()
                     if max_distance <= eps:
                         continue
 
-                    # normalize for correct NdotL
                     tolight_dir = tolight_vec / max_distance
 
-                    # old style shadow ray, but stop before the light sphere a bit
                     light_radius = getattr(light, 'radius', 0.0)
                     shadow_max = max_distance - light_radius - eps
                     if shadow_max <= eps:
@@ -71,18 +63,15 @@ class Integrator():
 
                         light_mat = light.material
 
-                        # spotlight path
                         if hasattr(light_mat, 'direct_radiance'):
                             direct_L_i = light_mat.direct_radiance(light.center, surface_point)
                         else:
-                            # old behavior for normal light
                             direct_L_i = light_mat.emitting()
 
                         Le = Le + (Le_BRDF * direct_L_i * NdotLe)
 
             throughput = sinfo.attenuation_color
 
-            # keep old roulette behavior
             if self.roulette and maxDepth <= 2:
                 p = min(0.95, max(throughput.r(), throughput.g(), throughput.b()))
                 if rtu.random_double() > p:

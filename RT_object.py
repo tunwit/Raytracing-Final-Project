@@ -175,7 +175,6 @@ class Triangle(Object):
         h = rtu.Vec3.cross_product(direction, self.edge2)
         a = rtu.Vec3.dot_product(self.edge1, h)
 
-        # If near zero → ray parallel to triangle
         if rtu.Interval.near_zero(a):
             return None
 
@@ -201,7 +200,6 @@ class Triangle(Object):
         hinfo = rtu.Hitinfo(hit_point, self.normal, t, self.material)
         hinfo.set_face_normal(rRay, self.normal)
 
-        # Optional UV (using barycentric coords)
         hinfo.set_uv(u, v)
 
         return hinfo
@@ -257,12 +255,10 @@ class Mesh(Object):
             v1 = tri.v1 - self.center
             v2 = tri.v2 - self.center
 
-            # apply transform
             v0 = self._apply_math(v0, self.scale, rad_x, rad_y, rad_z)
             v1 = self._apply_math(v1, self.scale, rad_x, rad_y, rad_z)
             v2 = self._apply_math(v2, self.scale, rad_x, rad_y, rad_z)
 
-            # move back + apply lift
             v0 = v0 + self.center + lift
             v1 = v1 + self.center + lift
             v2 = v2 + self.center + lift
@@ -327,7 +323,6 @@ class BVHNode(Object):
         objects = list(objects)
         n = len(objects)
 
-        # Base cases
         if n == 1:
             self.left = objects[0]
             self.right = None
@@ -341,7 +336,6 @@ class BVHNode(Object):
             self.box = rtu.surrounding_box(box_left, box_right)
             return
 
-        # Compute bounding box of all objects
         object_boxes = [(obj, obj.bounding_box()) for obj in objects]
         bbox_min = rtu.Vec3(float('inf'), float('inf'), float('inf'))
         bbox_max = rtu.Vec3(float('-inf'), float('-inf'), float('-inf'))
@@ -357,24 +351,19 @@ class BVHNode(Object):
                 max(bbox_max.z(), box.max.z())
             )
 
-        # Split axis = longest axis
         extent = bbox_max - bbox_min
         axis = np.argmax([extent.x(), extent.y(), extent.z()])
 
-        # Sort objects along the chosen axis using their bounding box centers
         object_boxes.sort(key=lambda obj_box: 0.5 * (obj_box[1].min[axis] + obj_box[1].max[axis]))
         objects = [obj for obj, _ in object_boxes]
 
-        # Split in the middle (median)
         mid = n // 2
         left_objects = objects[:mid]
         right_objects = objects[mid:]
 
-        # Create children recursively
         self.left = BVHNode(left_objects, max_leaf_size)
         self.right = BVHNode(right_objects, max_leaf_size)
 
-        # Compute enclosing bounding box
         self.box = rtu.surrounding_box(self.left.bounding_box(), self.right.bounding_box())
 
     def intersect(self, rRay, cInterval):

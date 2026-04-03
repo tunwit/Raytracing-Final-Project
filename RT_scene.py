@@ -2,20 +2,18 @@ import RT_utility as rtu
 import numpy as np
 import RT_object as rto
 class Scene:
-    def __init__(self, cBgcolor=rtu.Color(0.005, 0.005,0.005)) -> None:
+    def __init__(self, cBgcolor=rtu.Color(0.02, 0.02, 0.02)) -> None:
         self.obj_list = []
         self.hit_list = None
         self.background_color = cBgcolor
         self.light_list = []
         self.point_light_list = []
-        self._scene_bvh = None          # built lazily on first render
+        self._scene_bvh = None        
 
     def add_object(self, obj):
         self.obj_list.append(obj)
-        self._scene_bvh = None          # invalidate cached BVH
- 
-    # ── BVH helpers ──────────────────────────────────────────────────────────
- 
+        self._scene_bvh = None         
+  
     def build_bvh(self):
         """Build a top-level BVH over every object in the scene.
         Called automatically by find_lights() → render(), but you can also
@@ -31,10 +29,8 @@ class Scene:
             print(f"[Scene] BVH build failed ({e}), falling back to linear traversal.")
             self._scene_bvh = None
  
-    # ── Intersection ─────────────────────────────────────────────────────────
  
     def find_intersection(self, vRay, cInterval):
-        # Fast BVH path
         if self._scene_bvh is not None:
             hinfo = self._scene_bvh.intersect(vRay, rtu.Interval(cInterval.min_val, cInterval.max_val))
             if hinfo is not None:
@@ -42,7 +38,6 @@ class Scene:
                 return True
             return False
  
-        # Fallback: linear traversal (used when BVH is unavailable)
         found_hit = False
         closest_tmax = cInterval.max_val
         for obj in self.obj_list:
@@ -56,12 +51,10 @@ class Scene:
     def find_occlusion(self, vRay, cInterval):
         interval = rtu.Interval(cInterval.min_val, cInterval.max_val)
  
-        # BVH path: any hit inside the interval = occluded
         if self._scene_bvh is not None:
             hinfo = self._scene_bvh.intersect(vRay, interval)
             return hinfo is not None
  
-        # Fallback linear
         for obj in self.obj_list:
             if hasattr(obj, 'bvh'):
                 hinfo = obj.bvh.intersect(vRay, interval)
@@ -71,9 +64,7 @@ class Scene:
             if hinfo is not None:
                 return True
         return False
- 
-    # ── Accessors ─────────────────────────────────────────────────────────────
- 
+  
     def getHitNormalAt(self, idx):
         return self.hit_list[idx].getNormal()
  
@@ -87,9 +78,7 @@ class Scene:
         unit_direction = rtu.Vec3.unit_vector(rGen_ray.getDirection())
         a = (unit_direction.y() + 1.0) * 0.5
         return rtu.Color(1.0 , 0.94, 0.81) * (1.0 - a) + rtu.Color(1.0 , 0.84, 0.71) * a
- 
-    # ── Light discovery ───────────────────────────────────────────────────────
- 
+  
     def find_lights(self):
         self.light_list = []
         self.point_light_list = []

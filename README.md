@@ -1,30 +1,32 @@
-# RT-python-week010
-Ray tracing course week 10
+# Final Project
+ผู้จัดทำ
 
-This repository is for 'Raytracing in Entertainment Industry' (01418283).
-This course is set to be taught for undergrad students at Dept of Computer Science, Faculty of Science, Kasetsart University.
-The codes were rewritten and modified from https://raytracing.github.io/books/RayTracingInOneWeekend.html.
+- สหรัฐ ลีโอ ณ ลำพูน 6710405532
+- ธนัต เทพโพธา 6710405389
 
-**Prerequisites :**
-1. C/C++ or python.
-2. Object-Oriented Programming (OOP).
-3. Linear algebra for undergrad students.
+**Rendering Configuration**
+- Resolution: 3840 px (4K)
+- Samples per Pixel (SPP): 1024
+- Max Depth: 4
+- OS: Windows 11
+- CPU: 28 Cores (Multi-core rendering)
 
+**Scene 1: Room**
 
-**Class assignment**
+![alt text](image-1.png)
+- การจัด Interior Lighting
+- การใช้ Texture + Material
+- การจัด composition ของ scene
+- การจำลองแสงภายในห้อง
 
-Do not forget to submit your codes when code implementation is needed.
+**Scene 2: City**
 
-Note that to submit the rendered results, please use the following parameters.
-- at least 100 samples per pixel.
-- at least 5 max depth.
-- resolution width = 480p.
-- aspect ratio = 16:9.
+![alt text](image.png)
+- การใช้ SpotLight + attenuation
+- การ render Mesh (OBJ models)
+- การจัดแสงใน outdoor scene
+- Shadow และ falloff ของแสง
 
-1. Implement DoF in 'get_jittered_ray()'. Render the output with 'renderDoF()'.
-2. Implement DoF by using an 'aperture' parameter instead of 'defocus_angle'. Do not forget to replace all 'defocus_angle' calls. Render the output with 'renderDoF()' using the following parameters and commands.
-- aperture = 1.0, focus_distance = 5.0.
-- renderer.render() --> submit your rendered result.
-- renderer.render_jittered() --> submit your rendered result.
-3. Implement Motion blur effect in 'get_jittered_ray()'. Render the output with 'renderMoving().
+**Extra**
 
+![alt text](FinalIMG/extra_room(fullhd)l.png)
