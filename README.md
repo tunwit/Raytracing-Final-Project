@@ -13,7 +13,7 @@
 
 **Scene 1: Room**
 
-![alt text](image-1.png)
+![alt text](FinalIMG/final_room(4k).png)
 - การจัด Interior Lighting
 - การใช้ Texture + Material
 - การจัด composition ของ scene
@@ -21,7 +21,7 @@
 
 **Scene 2: City**
 
-![alt text](image.png)
+![alt text](FinalIMG/final_city(4k).png)
 - การใช้ SpotLight + attenuation
 - การ render Mesh (OBJ models)
 - การจัดแสงใน outdoor scene
